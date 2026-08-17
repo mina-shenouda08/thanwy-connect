@@ -10,33 +10,145 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ServantRouteImport } from './routes/servant'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as StudentRouteImport } from './routes/student'
+import { Route as ServantIndexRouteImport } from './routes/servant.index'
+import { Route as StudentIndexRouteImport } from './routes/student.index'
+import { Route as StudentBibleRouteImport } from './routes/student.bible'
+import { Route as StudentNotebookRouteImport } from './routes/student.notebook'
+import { Route as StudentQrRouteImport } from './routes/student.qr'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServantRoute = ServantRouteImport.update({
+  id: '/servant',
+  path: '/servant',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentRoute = StudentRouteImport.update({
+  id: '/student',
+  path: '/student',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServantIndexRoute = ServantIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ServantRoute,
+} as any)
+const StudentIndexRoute = StudentIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentBibleRoute = StudentBibleRouteImport.update({
+  id: '/bible',
+  path: '/bible',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentNotebookRoute = StudentNotebookRouteImport.update({
+  id: '/notebook',
+  path: '/notebook',
+  getParentRoute: () => StudentRoute,
+} as any)
+const StudentQrRoute = StudentQrRouteImport.update({
+  id: '/qr',
+  path: '/qr',
+  getParentRoute: () => StudentRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/servant': typeof ServantRouteWithChildren
+  '/signup': typeof SignupRoute
+  '/student': typeof StudentRouteWithChildren
+  '/student/bible': typeof StudentBibleRoute
+  '/student/notebook': typeof StudentNotebookRoute
+  '/student/qr': typeof StudentQrRoute
+  '/servant/': typeof ServantIndexRoute
+  '/student/': typeof StudentIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/student/bible': typeof StudentBibleRoute
+  '/student/notebook': typeof StudentNotebookRoute
+  '/student/qr': typeof StudentQrRoute
+  '/servant': typeof ServantIndexRoute
+  '/student': typeof StudentIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/servant': typeof ServantRouteWithChildren
+  '/signup': typeof SignupRoute
+  '/student': typeof StudentRouteWithChildren
+  '/student/bible': typeof StudentBibleRoute
+  '/student/notebook': typeof StudentNotebookRoute
+  '/student/qr': typeof StudentQrRoute
+  '/servant/': typeof ServantIndexRoute
+  '/student/': typeof StudentIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/servant'
+    | '/signup'
+    | '/student'
+    | '/student/bible'
+    | '/student/notebook'
+    | '/student/qr'
+    | '/servant/'
+    | '/student/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/signup'
+    | '/student/bible'
+    | '/student/notebook'
+    | '/student/qr'
+    | '/servant'
+    | '/student'
+  id:
+    | '__root__'
+    | '/'
+    | '/login'
+    | '/servant'
+    | '/signup'
+    | '/student'
+    | '/student/bible'
+    | '/student/notebook'
+    | '/student/qr'
+    | '/servant/'
+    | '/student/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LoginRoute: typeof LoginRoute
+  ServantRoute: typeof ServantRouteWithChildren
+  SignupRoute: typeof SignupRoute
+  StudentRoute: typeof StudentRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +160,106 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/servant': {
+      id: '/servant'
+      path: '/servant'
+      fullPath: '/servant'
+      preLoaderRoute: typeof ServantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/student': {
+      id: '/student'
+      path: '/student'
+      fullPath: '/student'
+      preLoaderRoute: typeof StudentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/servant/': {
+      id: '/servant/'
+      path: '/'
+      fullPath: '/servant/'
+      preLoaderRoute: typeof ServantIndexRouteImport
+      parentRoute: typeof ServantRoute
+    }
+    '/student/': {
+      id: '/student/'
+      path: '/'
+      fullPath: '/student/'
+      preLoaderRoute: typeof StudentIndexRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/bible': {
+      id: '/student/bible'
+      path: '/bible'
+      fullPath: '/student/bible'
+      preLoaderRoute: typeof StudentBibleRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/notebook': {
+      id: '/student/notebook'
+      path: '/notebook'
+      fullPath: '/student/notebook'
+      preLoaderRoute: typeof StudentNotebookRouteImport
+      parentRoute: typeof StudentRoute
+    }
+    '/student/qr': {
+      id: '/student/qr'
+      path: '/qr'
+      fullPath: '/student/qr'
+      preLoaderRoute: typeof StudentQrRouteImport
+      parentRoute: typeof StudentRoute
+    }
   }
 }
 
+interface ServantRouteChildren {
+  ServantIndexRoute: typeof ServantIndexRoute
+}
+
+const ServantRouteChildren: ServantRouteChildren = {
+  ServantIndexRoute: ServantIndexRoute,
+}
+
+const ServantRouteWithChildren =
+  ServantRoute._addFileChildren(ServantRouteChildren)
+
+interface StudentRouteChildren {
+  StudentBibleRoute: typeof StudentBibleRoute
+  StudentNotebookRoute: typeof StudentNotebookRoute
+  StudentQrRoute: typeof StudentQrRoute
+  StudentIndexRoute: typeof StudentIndexRoute
+}
+
+const StudentRouteChildren: StudentRouteChildren = {
+  StudentBibleRoute: StudentBibleRoute,
+  StudentNotebookRoute: StudentNotebookRoute,
+  StudentQrRoute: StudentQrRoute,
+  StudentIndexRoute: StudentIndexRoute,
+}
+
+const StudentRouteWithChildren =
+  StudentRoute._addFileChildren(StudentRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LoginRoute: LoginRoute,
+  ServantRoute: ServantRouteWithChildren,
+  SignupRoute: SignupRoute,
+  StudentRoute: StudentRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
