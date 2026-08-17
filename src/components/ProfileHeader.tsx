@@ -8,9 +8,9 @@ export function ProfileHeader({
   userId,
 }: {
   name: string;
-  grade?: string | null;
-  className?: string | null;
-  userId?: string;
+  grade?: string | null | undefined;
+  className?: string | null | undefined;
+  userId?: string | undefined;
 }) {
   return (
     <div className="flex items-center justify-between gap-4 rounded-3xl bg-tertiary p-5 text-tertiary-foreground">
