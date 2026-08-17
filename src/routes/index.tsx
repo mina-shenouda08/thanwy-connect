@@ -1,24 +1,42 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { Logo } from "@/components/Logo";
+import { useAuth } from "@/hooks/useAuth";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
+  ssr: false,
+  head: () => ({
+    meta: [
+      { title: "اجتماعات ثانوي — متابعة روحية للمرحلة الثانوية" },
+      {
+        name: "description",
+        content: "سجّل حضورك، نوتتك الروحية، وقراءات الكتاب المقدس في مكان واحد.",
+      },
+      { property: "og:title", content: "اجتماعات ثانوي" },
+      {
+        property: "og:description",
+        content: "سجّل حضورك، نوتتك الروحية، وقراءات الكتاب المقدس في مكان واحد.",
+      },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
+  const navigate = useNavigate();
+  const { data, isPending } = useAuth();
+
+  useEffect(() => {
+    if (isPending) return;
+    if (!data) void navigate({ to: "/login" });
+    else void navigate({ to: data.role === "servant" ? "/servant" : "/student" });
+  }, [data, isPending, navigate]);
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-background">
+      <Logo size={120} />
+      <h1 className="text-lg font-semibold text-foreground">اجتماعات ثانوي</h1>
+      <p className="text-sm text-muted-foreground">جاري التحميل…</p>
+    </main>
   );
 }
