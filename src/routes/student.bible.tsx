@@ -49,11 +49,37 @@ function BiblePage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("book_study_assignments")
-        .select("id, title, description, due_date")
+        .select("id, title, testament, book, chapter, due_date")
         .eq("grade_level", me!.profile!.grade_level!)
         .order("due_date", { ascending: true });
       return data ?? [];
     },
+  });
+
+  const { data: submissions = [] } = useQuery({
+    queryKey: ["book-study-submissions", me?.userId],
+    enabled: Boolean(me?.userId),
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("book_study_submissions")
+        .select("assignment_id")
+        .eq("student_id", me!.userId);
+      return (data ?? []).map((s) => s.assignment_id);
+    },
+  });
+
+  const markDone = useMutation({
+    mutationFn: async (assignmentId: string) => {
+      const { error } = await supabase
+        .from("book_study_submissions")
+        .insert({ assignment_id: assignmentId, student_id: me!.userId });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("تم تسجيل التسليم");
+      void qc.invalidateQueries({ queryKey: ["book-study-submissions"] });
+    },
+    onError: () => toast.error("تعذر تسجيل التسليم"),
   });
 
   const addReading = useMutation({
@@ -157,19 +183,26 @@ function BiblePage() {
           <p className="text-right text-sm text-muted-foreground">لا توجد واجبات حالياً</p>
         ) : (
           <ul className="space-y-2">
-            {assignments.map((a) => (
-              <li key={a.id} className="rounded-xl bg-surface px-4 py-3 text-right">
-                <p className="text-sm font-semibold text-foreground">{a.title}</p>
-                {a.description && (
-                  <p className="text-xs text-muted-foreground">{a.description}</p>
-                )}
-                {a.due_date && (
-                  <p className="mt-1 text-xs text-primary-soft">
-                    التسليم: {formatDate(a.due_date)}
+            {assignments.map((a) => {
+              const done = submissions.includes(a.id);
+              return (
+                <li key={a.id} className="space-y-2 rounded-xl bg-surface px-4 py-3 text-right">
+                  <p className="text-sm font-semibold text-foreground">{a.title}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {testamentLabel(a.testament)} — {a.book} {a.chapter}
                   </p>
-                )}
-              </li>
-            ))}
+                  <p className="text-xs text-primary-soft">التسليم: {formatDate(a.due_date)}</p>
+                  <button
+                    type="button"
+                    disabled={done}
+                    onClick={() => markDone.mutate(a.id)}
+                    className="press w-full rounded-full bg-secondary py-2 text-xs font-semibold text-secondary-foreground disabled:opacity-50"
+                  >
+                    {done ? "تم التسليم" : "تم"}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>
