@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ServantRouteImport } from './routes/servant'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as StudentRouteImport } from './routes/student'
+import { Route as ServantIndexRouteImport } from './routes/servant.index'
 import { Route as StudentIndexRouteImport } from './routes/student.index'
 import { Route as StudentBibleRouteImport } from './routes/student.bible'
 import { Route as StudentNotebookRouteImport } from './routes/student.notebook'
@@ -44,6 +45,11 @@ const StudentRoute = StudentRouteImport.update({
   path: '/student',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ServantIndexRoute = ServantIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ServantRoute,
+} as any)
 const StudentIndexRoute = StudentIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -68,34 +74,36 @@ const StudentQrRoute = StudentQrRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/servant': typeof ServantRoute
+  '/servant': typeof ServantRouteWithChildren
   '/signup': typeof SignupRoute
   '/student': typeof StudentRouteWithChildren
   '/student/bible': typeof StudentBibleRoute
   '/student/notebook': typeof StudentNotebookRoute
   '/student/qr': typeof StudentQrRoute
+  '/servant/': typeof ServantIndexRoute
   '/student/': typeof StudentIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/servant': typeof ServantRoute
   '/signup': typeof SignupRoute
   '/student/bible': typeof StudentBibleRoute
   '/student/notebook': typeof StudentNotebookRoute
   '/student/qr': typeof StudentQrRoute
+  '/servant': typeof ServantIndexRoute
   '/student': typeof StudentIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
-  '/servant': typeof ServantRoute
+  '/servant': typeof ServantRouteWithChildren
   '/signup': typeof SignupRoute
   '/student': typeof StudentRouteWithChildren
   '/student/bible': typeof StudentBibleRoute
   '/student/notebook': typeof StudentNotebookRoute
   '/student/qr': typeof StudentQrRoute
+  '/servant/': typeof ServantIndexRoute
   '/student/': typeof StudentIndexRoute
 }
 export interface FileRouteTypes {
@@ -109,16 +117,17 @@ export interface FileRouteTypes {
     | '/student/bible'
     | '/student/notebook'
     | '/student/qr'
+    | '/servant/'
     | '/student/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
-    | '/servant'
     | '/signup'
     | '/student/bible'
     | '/student/notebook'
     | '/student/qr'
+    | '/servant'
     | '/student'
   id:
     | '__root__'
@@ -130,13 +139,14 @@ export interface FileRouteTypes {
     | '/student/bible'
     | '/student/notebook'
     | '/student/qr'
+    | '/servant/'
     | '/student/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LoginRoute: typeof LoginRoute
-  ServantRoute: typeof ServantRoute
+  ServantRoute: typeof ServantRouteWithChildren
   SignupRoute: typeof SignupRoute
   StudentRoute: typeof StudentRouteWithChildren
 }
@@ -178,6 +188,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/servant/': {
+      id: '/servant/'
+      path: '/'
+      fullPath: '/servant/'
+      preLoaderRoute: typeof ServantIndexRouteImport
+      parentRoute: typeof ServantRoute
+    }
     '/student/': {
       id: '/student/'
       path: '/'
@@ -209,6 +226,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ServantRouteChildren {
+  ServantIndexRoute: typeof ServantIndexRoute
+}
+
+const ServantRouteChildren: ServantRouteChildren = {
+  ServantIndexRoute: ServantIndexRoute,
+}
+
+const ServantRouteWithChildren =
+  ServantRoute._addFileChildren(ServantRouteChildren)
+
 interface StudentRouteChildren {
   StudentBibleRoute: typeof StudentBibleRoute
   StudentNotebookRoute: typeof StudentNotebookRoute
@@ -229,7 +257,7 @@ const StudentRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
-  ServantRoute: ServantRoute,
+  ServantRoute: ServantRouteWithChildren,
   SignupRoute: SignupRoute,
   StudentRoute: StudentRouteWithChildren,
 }
