@@ -27,15 +27,15 @@ function StudentQrPage() {
     queryFn: async () => {
       const { data } = await supabase
         .from("attendance")
-        .select("id, status, created_at, events(title, event_date)")
+        .select("id, present, checked_in_at, events(title, event_date)")
         .eq("student_id", me!.userId)
-        .order("created_at", { ascending: false })
+        .order("checked_in_at", { ascending: false })
         .limit(30);
       return data ?? [];
     },
   });
 
-  const present = rows.filter((r) => r.status === "present").length;
+  const present = rows.filter((r) => r.present).length;
 
   return (
     <div className="space-y-6">
@@ -72,9 +72,7 @@ function StudentQrPage() {
                 key={r.id}
                 className="flex items-center justify-between rounded-xl bg-surface px-4 py-2 text-sm"
               >
-                <span className="text-xs text-secondary">
-                  {r.status === "present" ? "حاضر" : "غائب"}
-                </span>
+                <span className="text-xs text-secondary">{r.present ? "حاضر" : "غائب"}</span>
                 <span className="text-foreground">
                   {r.events?.title ?? "فعالية"}{" "}
                   <span className="text-xs text-muted-foreground">
