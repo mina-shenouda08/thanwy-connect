@@ -63,7 +63,7 @@ export async function syncQueuedScans() {
   return synced;
 }
 
-export async function recordScan(scan: PendingScan) {
+export async function recordScan(scan: Omit<PendingScan, "id">) {
   if (!navigator.onLine) {
     await queueScan(scan);
     return { queued: true as const };
