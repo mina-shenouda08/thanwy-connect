@@ -49,10 +49,22 @@ function SignupPage() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (fullName.trim().length < 3) return toast.error("أدخل الاسم الرباعي");
-    if (!grade) return toast.error("اختر المرحلة الدراسية");
-    if (password.length < 6) return toast.error("كلمة المرور 6 أحرف على الأقل");
-    if (password !== confirm) return toast.error("كلمة المرور غير متطابقة");
+    if (fullName.trim().length < 3) {
+      toast.error("أدخل الاسم الرباعي");
+      return;
+    }
+    if (!grade) {
+      toast.error("اختر المرحلة الدراسية");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("كلمة المرور 6 أحرف على الأقل");
+      return;
+    }
+    if (password !== confirm) {
+      toast.error("كلمة المرور غير متطابقة");
+      return;
+    }
 
     setLoading(true);
     const authEmail = email.trim() || `${crypto.randomUUID().slice(0, 12)}@thanwy.local`;
