@@ -16,6 +16,7 @@ import { Route as StudentRouteImport } from './routes/student'
 import { Route as StudentIndexRouteImport } from './routes/student.index'
 import { Route as StudentBibleRouteImport } from './routes/student.bible'
 import { Route as StudentNotebookRouteImport } from './routes/student.notebook'
+import { Route as StudentQrRouteImport } from './routes/student.qr'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,6 +53,11 @@ const StudentNotebookRoute = StudentNotebookRouteImport.update({
   path: '/notebook',
   getParentRoute: () => StudentRoute,
 } as any)
+const StudentQrRoute = StudentQrRouteImport.update({
+  id: '/qr',
+  path: '/qr',
+  getParentRoute: () => StudentRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/student': typeof StudentRouteWithChildren
   '/student/bible': typeof StudentBibleRoute
   '/student/notebook': typeof StudentNotebookRoute
+  '/student/qr': typeof StudentQrRoute
   '/student/': typeof StudentIndexRoute
 }
 export interface FileRoutesByTo {
@@ -68,6 +75,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/student/bible': typeof StudentBibleRoute
   '/student/notebook': typeof StudentNotebookRoute
+  '/student/qr': typeof StudentQrRoute
   '/student': typeof StudentIndexRoute
 }
 export interface FileRoutesById {
@@ -78,6 +86,7 @@ export interface FileRoutesById {
   '/student': typeof StudentRouteWithChildren
   '/student/bible': typeof StudentBibleRoute
   '/student/notebook': typeof StudentNotebookRoute
+  '/student/qr': typeof StudentQrRoute
   '/student/': typeof StudentIndexRoute
 }
 export interface FileRouteTypes {
@@ -89,6 +98,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/student/bible'
     | '/student/notebook'
+    | '/student/qr'
     | '/student/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/student/bible'
     | '/student/notebook'
+    | '/student/qr'
     | '/student'
   id:
     | '__root__'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/student'
     | '/student/bible'
     | '/student/notebook'
+    | '/student/qr'
     | '/student/'
   fileRoutesById: FileRoutesById
 }
@@ -167,18 +179,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentNotebookRouteImport
       parentRoute: typeof StudentRoute
     }
+    '/student/qr': {
+      id: '/student/qr'
+      path: '/qr'
+      fullPath: '/student/qr'
+      preLoaderRoute: typeof StudentQrRouteImport
+      parentRoute: typeof StudentRoute
+    }
   }
 }
 
 interface StudentRouteChildren {
   StudentBibleRoute: typeof StudentBibleRoute
   StudentNotebookRoute: typeof StudentNotebookRoute
+  StudentQrRoute: typeof StudentQrRoute
   StudentIndexRoute: typeof StudentIndexRoute
 }
 
 const StudentRouteChildren: StudentRouteChildren = {
   StudentBibleRoute: StudentBibleRoute,
   StudentNotebookRoute: StudentNotebookRoute,
+  StudentQrRoute: StudentQrRoute,
   StudentIndexRoute: StudentIndexRoute,
 }
 
