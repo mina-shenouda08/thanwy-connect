@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as StudentRouteImport } from './routes/student'
 import { Route as StudentIndexRouteImport } from './routes/student.index'
+import { Route as StudentBibleRouteImport } from './routes/student.bible'
 import { Route as StudentNotebookRouteImport } from './routes/student.notebook'
 
 const IndexRoute = IndexRouteImport.update({
@@ -41,6 +42,11 @@ const StudentIndexRoute = StudentIndexRouteImport.update({
   path: '/',
   getParentRoute: () => StudentRoute,
 } as any)
+const StudentBibleRoute = StudentBibleRouteImport.update({
+  id: '/bible',
+  path: '/bible',
+  getParentRoute: () => StudentRoute,
+} as any)
 const StudentNotebookRoute = StudentNotebookRouteImport.update({
   id: '/notebook',
   path: '/notebook',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/student': typeof StudentRouteWithChildren
+  '/student/bible': typeof StudentBibleRoute
   '/student/notebook': typeof StudentNotebookRoute
   '/student/': typeof StudentIndexRoute
 }
@@ -59,6 +66,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/student/bible': typeof StudentBibleRoute
   '/student/notebook': typeof StudentNotebookRoute
   '/student': typeof StudentIndexRoute
 }
@@ -68,21 +76,35 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/student': typeof StudentRouteWithChildren
+  '/student/bible': typeof StudentBibleRoute
   '/student/notebook': typeof StudentNotebookRoute
   '/student/': typeof StudentIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/login' | '/signup' | '/student' | '/student/notebook' | '/student/'
+    | '/'
+    | '/login'
+    | '/signup'
+    | '/student'
+    | '/student/bible'
+    | '/student/notebook'
+    | '/student/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/signup' | '/student/notebook' | '/student'
+  to:
+    | '/'
+    | '/login'
+    | '/signup'
+    | '/student/bible'
+    | '/student/notebook'
+    | '/student'
   id:
     | '__root__'
     | '/'
     | '/login'
     | '/signup'
     | '/student'
+    | '/student/bible'
     | '/student/notebook'
     | '/student/'
   fileRoutesById: FileRoutesById
@@ -131,6 +153,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentIndexRouteImport
       parentRoute: typeof StudentRoute
     }
+    '/student/bible': {
+      id: '/student/bible'
+      path: '/bible'
+      fullPath: '/student/bible'
+      preLoaderRoute: typeof StudentBibleRouteImport
+      parentRoute: typeof StudentRoute
+    }
     '/student/notebook': {
       id: '/student/notebook'
       path: '/notebook'
@@ -142,11 +171,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface StudentRouteChildren {
+  StudentBibleRoute: typeof StudentBibleRoute
   StudentNotebookRoute: typeof StudentNotebookRoute
   StudentIndexRoute: typeof StudentIndexRoute
 }
 
 const StudentRouteChildren: StudentRouteChildren = {
+  StudentBibleRoute: StudentBibleRoute,
   StudentNotebookRoute: StudentNotebookRoute,
   StudentIndexRoute: StudentIndexRoute,
 }
