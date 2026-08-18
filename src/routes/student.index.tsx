@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CalendarDays, LogOut } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { EventCard, type EventRow } from "@/components/EventCard";
 import { ProfileHeader } from "@/components/ProfileHeader";
 import { useAuth, signOut } from "@/hooks/useAuth";
@@ -29,7 +30,40 @@ export const Route = createFileRoute("/student/")({
 
 function StudentHome() {
   const { data: me } = useAuth();
+  const qc = useQueryClient();
   const [selected, setSelected] = useState<EventRow | null>(null);
+
+  const avatarPath = me?.profile?.avatar_url ?? null;
+
+  const { data: avatarUrl } = useQuery({
+    queryKey: ["avatar", avatarPath],
+    enabled: Boolean(avatarPath),
+    queryFn: async () => {
+      const { data } = await supabase.storage
+        .from("avatars")
+        .createSignedUrl(avatarPath!, 60 * 60);
+      return data?.signedUrl ?? null;
+    },
+  });
+
+  const uploadAvatar = useMutation({
+    mutationFn: async (file: File) => {
+      const ext = file.name.split(".").pop() ?? "jpg";
+      const path = `${me!.userId}/avatar-${Date.now()}.${ext}`;
+      const up = await supabase.storage.from("avatars").upload(path, file, { upsert: true });
+      if (up.error) throw up.error;
+      const { error } = await supabase
+        .from("users")
+        .update({ avatar_url: path })
+        .eq("id", me!.userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("تم تحديث صورة الحساب");
+      void qc.invalidateQueries({ queryKey: ["auth"] });
+    },
+    onError: () => toast.error("تعذر تحديث الصورة"),
+  });
 
   const { data: className } = useQuery({
     queryKey: ["class", me?.profile?.class_id],
@@ -80,7 +114,9 @@ function StudentHome() {
         name={me?.profile?.full_name ?? "—"}
         grade={me?.profile?.grade_level}
         className={className ?? null}
-        {...(me?.userId ? { userId: me.userId } : {})}
+        avatarUrl={avatarUrl ?? null}
+        uploading={uploadAvatar.isPending}
+        {...(me?.userId ? { onPickAvatar: (f: File) => uploadAvatar.mutate(f) } : {})}
       />
 
       <section className="space-y-4">
