@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, NotebookPen } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Check, NotebookPen, Save } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -41,21 +42,31 @@ function NotebookPage() {
   const todayRow = rows.find((r) => r.entry_date === today);
   const todayPrayers = (todayRow?.prayers ?? {}) as Record<string, boolean>;
 
-  const toggle = useMutation({
-    mutationFn: async (key: string) => {
-      const next = { ...todayPrayers, [key]: !todayPrayers[key] };
+  const [draft, setDraft] = useState<Record<string, boolean>>({});
+  const [dirty, setDirty] = useState(false);
+
+  useEffect(() => {
+    if (!dirty) setDraft(todayPrayers);
+  }, [todayRow?.id, dirty]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const save = useMutation({
+    mutationFn: async () => {
       const { error } = await supabase.from("spiritual_journal").upsert(
         {
           student_id: me!.userId,
           kind: "prayers",
           entry_date: today,
-          prayers: next,
+          prayers: draft,
         },
         { onConflict: "student_id,kind,entry_date" },
       );
       if (error) throw error;
     },
-    onSuccess: () => void qc.invalidateQueries({ queryKey: ["journal"] }),
+    onSuccess: () => {
+      setDirty(false);
+      toast.success("تم حفظ صلوات اليوم في النوتة الروحية");
+      void qc.invalidateQueries({ queryKey: ["journal"] });
+    },
     onError: () => toast.error("تعذر الحفظ، حاول مرة أخرى"),
   });
 
@@ -70,12 +81,15 @@ function NotebookPage() {
         <p className="text-right text-sm text-muted-foreground">صلوات اليوم — {formatDate(today)}</p>
         <ul className="space-y-2">
           {PRAYERS.map((p) => {
-            const done = Boolean(todayPrayers[p.key]);
+            const done = Boolean(draft[p.key]);
             return (
               <li key={p.key}>
                 <button
                   type="button"
-                  onClick={() => toggle.mutate(p.key)}
+                  onClick={() => {
+                    setDirty(true);
+                    setDraft((d) => ({ ...d, [p.key]: !d[p.key] }));
+                  }}
                   className="press flex w-full items-center justify-between rounded-xl bg-surface px-4 py-3 text-sm"
                 >
                   <span
@@ -91,6 +105,14 @@ function NotebookPage() {
             );
           })}
         </ul>
+        <button
+          type="button"
+          disabled={save.isPending}
+          onClick={() => save.mutate()}
+          className="press flex w-full items-center justify-center gap-2 rounded-full bg-secondary py-3 text-sm font-semibold text-secondary-foreground disabled:opacity-50"
+        >
+          <Save className="h-4 w-4" /> حفظ في النوتة الروحية
+        </button>
       </section>
 
       <section className="space-y-3 rounded-2xl border border-border bg-card p-5">
