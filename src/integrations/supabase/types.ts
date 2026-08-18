@@ -352,6 +352,8 @@ export type Database = {
       }
       users: {
         Row: {
+          address: string | null
+          avatar_url: string | null
           class_id: string | null
           created_at: string
           email: string | null
@@ -360,6 +362,8 @@ export type Database = {
           id: string
         }
         Insert: {
+          address?: string | null
+          avatar_url?: string | null
           class_id?: string | null
           created_at?: string
           email?: string | null
@@ -368,6 +372,8 @@ export type Database = {
           id: string
         }
         Update: {
+          address?: string | null
+          avatar_url?: string | null
           class_id?: string | null
           created_at?: string
           email?: string | null
