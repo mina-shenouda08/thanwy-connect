@@ -1,7 +1,18 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { ArrowLeft, Eye, EyeOff, GraduationCap, Lock, Mail, RotateCcw, User, Users } from "lucide-react";
+import {
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  GraduationCap,
+  Lock,
+  Mail,
+  MapPin,
+  RotateCcw,
+  User,
+  Users,
+} from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { GRADES } from "@/lib/thanwy";
@@ -27,6 +38,7 @@ function SignupPage() {
   const navigate = useNavigate();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [address, setAddress] = useState("");
   const [grade, setGrade] = useState("");
   const [classId, setClassId] = useState("");
   const [password, setPassword] = useState("");
@@ -55,6 +67,10 @@ function SignupPage() {
     }
     if (!grade) {
       toast.error("اختر المرحلة الدراسية");
+      return;
+    }
+    if (address.trim().length < 5) {
+      toast.error("أدخل العنوان بالكامل");
       return;
     }
     if (password.length < 6) {
@@ -87,6 +103,7 @@ function SignupPage() {
       id: data.user.id,
       full_name: fullName.trim(),
       email: email.trim() || null,
+      address: address.trim(),
       grade_level: grade,
       class_id: classId || null,
     });
