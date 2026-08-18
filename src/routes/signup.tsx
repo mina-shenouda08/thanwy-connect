@@ -166,6 +166,22 @@ function SignupPage() {
         </div>
 
         <div className="space-y-2">
+          <label className="block text-sm text-muted-foreground" htmlFor="address">
+            العنوان بالكامل
+          </label>
+          <div className={fieldWrap}>
+            <input
+              id="address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="المحافظة، الحي، الشارع، رقم المنزل"
+              className={fieldInput}
+            />
+            <MapPin className="h-5 w-5 shrink-0 text-primary" />
+          </div>
+        </div>
+
+        <div className="space-y-2">
           <span className="block text-sm text-muted-foreground">المرحلة الدراسية / الفصل</span>
           <div className="grid grid-cols-2 gap-3">
             <div className={fieldWrap}>
