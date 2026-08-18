@@ -7,7 +7,7 @@ import { EventCard, type EventRow } from "@/components/EventCard";
 import { ProfileHeader } from "@/components/ProfileHeader";
 import { useAuth, signOut } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { PRAYERS, formatDate, testamentLabel, todayISO } from "@/lib/thanwy";
+import { PRAYER_COUNTERS, SACRAMENTS, formatDate, testamentLabel, todayISO } from "@/lib/thanwy";
 import {
   Dialog,
   DialogContent,
@@ -39,9 +39,7 @@ function StudentHome() {
     queryKey: ["avatar", avatarPath],
     enabled: Boolean(avatarPath),
     queryFn: async () => {
-      const { data } = await supabase.storage
-        .from("avatars")
-        .createSignedUrl(avatarPath!, 60 * 60);
+      const { data } = await supabase.storage.from("avatars").createSignedUrl(avatarPath!, 60 * 60);
       return data?.signedUrl ?? null;
     },
   });
@@ -108,6 +106,29 @@ function StudentHome() {
   const prayerDays = journal.filter((r) => r.kind === "prayers").slice(0, 4);
   const readings = journal.filter((r) => r.kind === "reading").slice(0, 3);
 
+  const weekTotalPrayers = journal
+    .filter((r) => r.kind === "prayers")
+    .slice(0, 7)
+    .reduce((sum, r) => {
+      const p = (r.prayers ?? {}) as Record<string, unknown>;
+      let dayTotal = 0;
+      PRAYER_COUNTERS.forEach((x) => {
+        const v = p[x.key];
+        if (typeof v === "number") dayTotal += v;
+      });
+      return sum + dayTotal;
+    }, 0);
+
+  let latestCommunion = "";
+  let latestConfession = "";
+  for (const r of prayerDays) {
+    const p = (r.prayers ?? {}) as Record<string, unknown>;
+    if (!latestCommunion && typeof p["communion"] === "string") latestCommunion = p["communion"];
+    if (!latestConfession && typeof p["confession"] === "string")
+      latestConfession = p["confession"];
+    if (latestCommunion && latestConfession) break;
+  }
+
   return (
     <div className="space-y-6">
       <ProfileHeader
@@ -144,17 +165,37 @@ function StudentHome() {
           <p className="text-sm text-muted-foreground">لم تُسجل صلوات بعد</p>
         ) : (
           <ul className="space-y-2">
-            {prayerDays.map((d) => {
-              const p = (d.prayers ?? {}) as Record<string, boolean>;
-              const done = PRAYERS.filter((x) => p[x.key]).length;
+            <li className="flex items-center justify-between rounded-xl bg-surface px-4 py-2 text-sm">
+              <span className="text-secondary font-semibold">
+                {weekTotalPrayers} صلاة هذا الأسبوع
+              </span>
+              <span className="text-muted-foreground">المجموع</span>
+            </li>
+            {latestCommunion && (
+              <li className="flex items-center justify-between rounded-xl bg-surface px-4 py-2 text-sm">
+                <span className="text-foreground">{formatDate(latestCommunion)}</span>
+                <span className="text-muted-foreground">{SACRAMENTS[0].label}</span>
+              </li>
+            )}
+            {latestConfession && (
+              <li className="flex items-center justify-between rounded-xl bg-surface px-4 py-2 text-sm">
+                <span className="text-foreground">{formatDate(latestConfession)}</span>
+                <span className="text-muted-foreground">{SACRAMENTS[1].label}</span>
+              </li>
+            )}
+            {prayerDays.slice(0, 4).map((d) => {
+              const p = (d.prayers ?? {}) as Record<string, unknown>;
+              let total = 0;
+              PRAYER_COUNTERS.forEach((x) => {
+                const v = p[x.key];
+                if (typeof v === "number") total += v;
+              });
               return (
                 <li
                   key={d.id}
                   className="flex items-center justify-between rounded-xl bg-surface px-4 py-2 text-sm"
                 >
-                  <span className="text-secondary">
-                    {done}/{PRAYERS.length}
-                  </span>
+                  <span className="text-secondary">{total} صلاة</span>
                   <span className="text-muted-foreground">{formatDate(d.entry_date)}</span>
                 </li>
               );
@@ -201,9 +242,7 @@ function StudentHome() {
         <DialogContent className="text-right">
           <DialogHeader>
             <DialogTitle>{selected?.title}</DialogTitle>
-            <DialogDescription>
-              {selected ? formatDate(selected.event_date) : ""}
-            </DialogDescription>
+            <DialogDescription>{selected ? formatDate(selected.event_date) : ""}</DialogDescription>
           </DialogHeader>
           <div className="space-y-1 text-sm text-muted-foreground">
             <p>المكان: {selected?.location ?? "—"}</p>
