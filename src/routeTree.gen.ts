@@ -15,6 +15,7 @@ import { Route as ServantRouteImport } from './routes/servant'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as StudentRouteImport } from './routes/student'
 import { Route as ServantIndexRouteImport } from './routes/servant.index'
+import { Route as ServantEventsRouteImport } from './routes/servant.events'
 import { Route as StudentIndexRouteImport } from './routes/student.index'
 import { Route as StudentBibleRouteImport } from './routes/student.bible'
 import { Route as StudentNotebookRouteImport } from './routes/student.notebook'
@@ -50,6 +51,11 @@ const ServantIndexRoute = ServantIndexRouteImport.update({
   path: '/',
   getParentRoute: () => ServantRoute,
 } as any)
+const ServantEventsRoute = ServantEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => ServantRoute,
+} as any)
 const StudentIndexRoute = StudentIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -77,6 +83,7 @@ export interface FileRoutesByFullPath {
   '/servant': typeof ServantRouteWithChildren
   '/signup': typeof SignupRoute
   '/student': typeof StudentRouteWithChildren
+  '/servant/events': typeof ServantEventsRoute
   '/student/bible': typeof StudentBibleRoute
   '/student/notebook': typeof StudentNotebookRoute
   '/student/qr': typeof StudentQrRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/servant/events': typeof ServantEventsRoute
   '/student/bible': typeof StudentBibleRoute
   '/student/notebook': typeof StudentNotebookRoute
   '/student/qr': typeof StudentQrRoute
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   '/servant': typeof ServantRouteWithChildren
   '/signup': typeof SignupRoute
   '/student': typeof StudentRouteWithChildren
+  '/servant/events': typeof ServantEventsRoute
   '/student/bible': typeof StudentBibleRoute
   '/student/notebook': typeof StudentNotebookRoute
   '/student/qr': typeof StudentQrRoute
@@ -114,6 +123,7 @@ export interface FileRouteTypes {
     | '/servant'
     | '/signup'
     | '/student'
+    | '/servant/events'
     | '/student/bible'
     | '/student/notebook'
     | '/student/qr'
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/signup'
+    | '/servant/events'
     | '/student/bible'
     | '/student/notebook'
     | '/student/qr'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
     | '/servant'
     | '/signup'
     | '/student'
+    | '/servant/events'
     | '/student/bible'
     | '/student/notebook'
     | '/student/qr'
@@ -195,6 +207,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ServantIndexRouteImport
       parentRoute: typeof ServantRoute
     }
+    '/servant/events': {
+      id: '/servant/events'
+      path: '/events'
+      fullPath: '/servant/events'
+      preLoaderRoute: typeof ServantEventsRouteImport
+      parentRoute: typeof ServantRoute
+    }
     '/student/': {
       id: '/student/'
       path: '/'
@@ -227,10 +246,12 @@ declare module '@tanstack/react-router' {
 }
 
 interface ServantRouteChildren {
+  ServantEventsRoute: typeof ServantEventsRoute
   ServantIndexRoute: typeof ServantIndexRoute
 }
 
 const ServantRouteChildren: ServantRouteChildren = {
+  ServantEventsRoute: ServantEventsRoute,
   ServantIndexRoute: ServantIndexRoute,
 }
 
