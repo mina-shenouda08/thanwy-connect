@@ -8,6 +8,8 @@ export type Profile = {
   email: string | null;
   grade_level: string | null;
   class_id: string | null;
+  address: string | null;
+  avatar_url: string | null;
 };
 
 export function useAuth() {
@@ -31,7 +33,7 @@ export function useAuth() {
       const [{ data: profile }, { data: roles }] = await Promise.all([
         supabase
           .from("users")
-          .select("id, full_name, email, grade_level, class_id")
+          .select("id, full_name, email, grade_level, class_id, address, avatar_url")
           .eq("id", user.id)
           .maybeSingle(),
         supabase.from("user_roles").select("role").eq("user_id", user.id),
